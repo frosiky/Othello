@@ -18,12 +18,14 @@ const put = (index) => {
     return
   }
   oth.put(move, next)
-  oth.goForward()
+  oth.next()
   if (oth.canput(oth.data, oth.turn) == 1) {
     console.log('[Othello]: passed')
-    oth.goForward()
+    oth.log(0n, 0n)
+    oth.next()
     if (oth.canput(oth.data, oth.turn) == 1) {
       console.log('[Othello]: game ended')
+      oth.undo(1)
     }
   }
   board.value = oth.board(showPreview)

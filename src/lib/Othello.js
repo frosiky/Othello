@@ -3,16 +3,6 @@ export default class Othello {
   //b,w
   data = [0x0000001008000000n, 0x0000000810000000n]
   turn = 0b0
-  dir = [
-    [-1, -1],
-    [-1, 0],
-    [-1, 1],
-    [0, -1],
-    [0, 1],
-    [1, -1],
-    [1, 0],
-    [1, 1]
-  ]
   history = { move: [], flip: [] }
   put(move, reverse, turn = this.turn, log = true) {
     this.data[turn ^ 1] ^= move | reverse
@@ -108,7 +98,7 @@ export default class Othello {
     }
     for (let i = 0; i < range; i++) {
       const previous = { move: this.history.move.pop(), flip: this.history.flip.pop() }
-      this.goForward()
+      this.next()
       this.put(previous.move, previous.flip, this.turn, false)
     }
   }
@@ -134,69 +124,7 @@ export default class Othello {
         return 0n
     }
   }
-  goForward() {
+  next() {
     this.turn = this.turn ^ 1
-  }
-  cpu(depth) {
-    let high = -Infinity
-    let results = []
-    const choice = this.convertBoard(this.data)
-    for (const pos of choice) {
-      const flipCells = this.putIf(pos[0], pos[1])
-      const board_choice = []
-      for (let i = 0; i < 8; i++) {
-        const line_choice = []
-        for (let j = 0; j < 8; j++) {
-          if (flipCells.includes([i, j])) line_choice.push(this.turn)
-          else line_choice.push(this.data[i][j])
-        }
-        board_choice.push(line_choice)
-      }
-      const score = this.branch(board_choice, depth - 1, this.turn * -1) * -1
-      if (high < score) {
-        high = score
-        results = [pos]
-      } else if (high == score) {
-        results.push(pos)
-      }
-    }
-    return results[Math.floor(Math.random() * results.length)]
-  }
-  branch(board, depth, turn, pass = false) {
-    if (depth == 0)
-      //reaching deepest => return value of this leaf
-      return this.evaluate(board, turn)
-    let high = -Infinity
-    for (const pos of this.canput(board, turn)) {
-      const flipCells = this.putIf(pos[0], pos[1], board, turn)
-      const board_branch = []
-      for (let i = 0; i < 8; i++) {
-        const line_branch = []
-        for (let j = 0; j < 8; j++) {
-          if (flipCells.includes([i, j])) line_branch.push(turn)
-          else line_branch.push(board[i][j])
-        }
-        board_branch.push(line_branch)
-      }
-      //branching deeper
-      //in order to find higher point
-      high = Math.max(high, this.branch(board_branch, depth - 1, turn * -1) * -1)
-      if (high == -Infinity) {
-        if (pass) {
-          return this.evaluate(board_branch, turn)
-        }
-        high = Math.max(high, this.branch(board_branch, depth, turn * -1, true) * -1)
-      }
-    }
-    return high
-  }
-  evaluate(board, color) {
-    let points = 0
-    for (let i = 0; i < 8; i++) {
-      for (let j = 0; j < 8; j++) {
-        points += this.cellValue[i][j] * board[i][j] * color
-      }
-    }
-    return points
   }
 }
