@@ -43,7 +43,7 @@ const undo = () => {
   oth.undo(1);
   board.value = oth.board(showPreview);
   pop.value = oth.pop();
-  state.value = "一手戻りました" + (oth.turn == 0 ? "黒" : "白") + "の手番です";
+  state.value = "一手戻りました " + (oth.turn == 0 ? "黒" : "白") + "の手番です";
 };
 const reset = () => {
   oth = new Othello();
